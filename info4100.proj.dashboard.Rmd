@@ -112,6 +112,7 @@ Go through the planning / sketching process described in the reading about dashb
 * For whom? Who will use it and what is their background?
 
     + [The teacher dashboard is designed for the course instructor who needs to monitor overall class performance and engagement to tailor teaching methods and identify students who may need additional support.]
+    + [For academic researchers who are interested in analyzing the data for broader educational studies or program improvements.]
     
 * Why? What is the goal? What questions to answer?
 
