@@ -1,6 +1,6 @@
 ---
 title: "Dashboards for Clicker Data"
-author: '[[Kellan Liu, ql348]]'
+author: '[[Kellan Liu, ql348...]]'
 subtitle: INFO 4100 Learning Analytics
 output:
   word_document: default
