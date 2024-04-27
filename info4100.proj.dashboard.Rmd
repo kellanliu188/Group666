@@ -197,6 +197,17 @@ Use the space below to be ready for your information visualizations in the dashb
 ####### BEGIN INPUT             #######
 #######################################
 
+# include session trends for instructor dashboard
+
+session_summary <- quiz %>%
+  group_by(YEAR, SESSION_NUMBER) %>%
+  summarise(
+    Avg_Attendance = mean(as.numeric(ATTENDED)),
+    Avg_Quiz_Score = mean(QUIZ_SCORE, na.rm = TRUE),
+    Avg_Participation_Rate = mean(TOTAL_COMPLETED_CLICKER/TOTAL_POSSIBLE_CLICKER, na.rm = TRUE),
+    Avg_Correct_Quiz_Clicker = mean(CORRECT_Q_CLICKER, na.rm = TRUE),
+    Avg_Temperature = mean(AVG_T_CLICKER, na.rm = TRUE)
+  )
 
 
 #######################################
