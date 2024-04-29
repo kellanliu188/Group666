@@ -85,19 +85,26 @@ Go through the planning / sketching process described in the reading about dashb
 *Planning for the student dashboard*
 
 -   For whom? Who will use it and what is their background?
+
     -   [The student dashboard is intended for individual students enrolled in the BI course. It will provide personalized data to help them understand their own performance and engagement relative to their peers. We pick student number 80]
     -   [Student 80 was a graduate student, with little database background but moderate programming background.]
+    
 -   Why? What is the goal? What questions to answer?
+
     -   [Provide a clear view of the student's attendance and participation in iClicker sessions.]
     -   [Show individual quiz scores and overall performance throughout the course.]
     -   [Compare their performance and engagement against the class average or specific groups like other graduate students.]
     -   [Identify areas of strength and weakness to guide their studies and preparation.]
+    
 -   What? What data to show and what is its structure?
+
     -   [Individual session attendance and the proportion of iClicker questions answered versus those available.]
     -   [Aggregate scores and comparisons to class or group averages.]
     -   [Scores from quizzes associated with iClicker sessions.]
     -   [Visualization of skill levels reported in the Skills Survey, contrasting them with the average levels in their program or the entire class.]
+    
 -   How? How will visualizations support the goal?
+
     -   [line charts showing quiz scores over time compared to the class average.]
     -   [bar graphs comapring the student engagement with the rest of the student]
     -   [Heat maps or color-coded tables indicating attendance patterns.]
@@ -149,46 +156,48 @@ Your team can split up the tasks. Some work on creating the UI (this part), whil
 #######################################
 # Example of a tab (i.e. page)
 instructor_dash = tabItem(
-    tabName = "instructor",
-    h2("Instructor Dashboard"),
-    
-    # Dynamic infoBoxes
-    fluidRow(
-      infoBoxOutput("inst.info1"),
-      infoBoxOutput("inst.info2")
-    ),
-    # Any visualization
-    fluidRow(
-        box(
-            title = "Performance Overview",
-            plotOutput("inst.plot1", height = 250)
-        ),
-        box(
-            title = "Attendance Overview",
-            plotOutput("inst.plot2", height = 250)
-        ),
-        box(
-            title = "Performance vs. Attendance",
-            plotOutput("inst.plot3", height = 250)
-        ),
-        box(
-            title = "Temperature Overview",
-            plotOutput("inst.plot4", height = 250)
-        ),
-        box(
-          title = "Socres Distribution",
-          plotOutput("inst.plot5", height = 250) ),
-        box(
-          title = "Attendance vs. Average Quiz Score",
-          plotOutput("inst.plot6", height = 250)
-        )
-    )
+  tabName = "instructor",
+  h2("Instructor Dashboard"),
+  
+  
+  # Dynamic infoBoxes
+  fluidRow(infoBoxOutput("inst.info1"),
+           infoBoxOutput("inst.info2")),
+  # Any visualization
+  fluidRow(
+    box(title = "Performance Overview",
+        plotOutput("inst.plot1", height = 250)),
+    box(title = "Attendance Overview",
+        plotOutput("inst.plot2", height = 250)),
+    box(title = "Performance vs. Attendance",
+        plotOutput("inst.plot3", height = 250)),
+    box(title = "Temperature Overview",
+        plotOutput("inst.plot4", height = 250)),
+    box(title = "Socres Distribution",
+        plotOutput("inst.plot5", height = 250)),
+    box(title = "Attendance vs. Average Quiz Score",
+        plotOutput("inst.plot6", height = 250))
+  )
 )
 
 # Another empty tab
 student_dash = tabItem(
   tabName = "student",
-  h2("Student Dashboard")
+  h2("Student Dashboard"),
+  # Dynamic infoBoxes
+  fluidRow(infoBoxOutput("inst.info1"),
+           infoBoxOutput("inst.info2")),
+  # Any visualization
+  fluidRow(
+    box(title = "Plot1",
+        plotOutput("inst.plot1", height = 250)),
+    box(title = "2",
+        plotOutput("inst.plot2", height = 250)),
+    box(title = "3",
+        plotOutput("inst.plot3", height = 250)),
+    box(title = "4",
+        plotOutput("inst.plot4", height = 250))
+  )
 )
 
 #######################################
@@ -215,19 +224,19 @@ session_summary <- quiz %>%
   summarise(
     Avg_Attendance = mean(as.numeric(ATTENDED)),
     Avg_Quiz_Score = mean(QUIZ_SCORE, na.rm = TRUE),
-    Avg_Participation_Rate = mean(TOTAL_COMPLETED_CLICKER/TOTAL_POSSIBLE_CLICKER, na.rm = TRUE),
+    Avg_Participation_Rate = mean(TOTAL_COMPLETED_CLICKER / TOTAL_POSSIBLE_CLICKER, na.rm = TRUE),
     Avg_Correct_Quiz_Clicker = mean(CORRECT_Q_CLICKER, na.rm = TRUE),
     Avg_Temperature = mean(AVG_T_CLICKER, na.rm = TRUE)
   )
 
 ## Student data
 
-combined_data = merge(experience, quiz, by="STUDENT_KEY")
-student_80 = subset(quiz, STUDENT_KEY==80)
-session_2017 = subset(session_summary, YEAR==2017)
+combined_data = merge(experience, quiz, by = "STUDENT_KEY")
+student_80 = subset(quiz, STUDENT_KEY == 80)
+session_2017 = subset(session_summary, YEAR == 2017)
 
 ## use this dataset to draw the bar chart, comparing the quiz score with rest of the class over time
-quiz_data_comapre = merge(session_2017, student_80, by='SESSION_NUMBER') %>%
+quiz_data_comapre = merge(session_2017, student_80, by = 'SESSION_NUMBER') %>%
   select(SESSION_NUMBER, Avg_Quiz_Score, QUIZ_SCORE)
 
 ## Use below for next grpah
@@ -237,7 +246,7 @@ student_80_engagement = mean(student_80$TOTAL_COMPLETED_CLICKER / student_80$TOT
 #use the data below to create two heapmap for attendance check, one for class, one for student 80
 attendance_matrix_80 = student_80 %>%
   select(SESSION_NUMBER, ATTENDED) %>%
-  spread(key = SESSION_NUMBER, value = ATTENDED) 
+  spread(key = SESSION_NUMBER, value = ATTENDED)
 
 attendance_matrix = session_2017 %>%
   select(SESSION_NUMBER, Avg_Attendance) %>%
@@ -258,8 +267,15 @@ average_skills = experience %>%
 
 student_skills_80 = experience %>%
   filter(STUDENT_KEY == 80) %>%
-  select(DATABASE_SCORE, SQL_SCORE, PROGRAMING_SCORE, STORED_PROC_SCORE,
-         ETL_SCORE, DATA_VIS_SCORE, SKILL_SURVEY_SCORE)
+  select(
+    DATABASE_SCORE,
+    SQL_SCORE,
+    PROGRAMING_SCORE,
+    STORED_PROC_SCORE,
+    ETL_SCORE,
+    DATA_VIS_SCORE,
+    SKILL_SURVEY_SCORE
+  )
 
 
 #######################################
@@ -274,87 +290,101 @@ This is where you create the content for the wire frames you created above. Agai
 
 ```{r}
 server = function(input, output) {
+  #######################################
+  ####### BEGIN INPUT: Question 4 #######
+  #######################################
+  
+  output$inst.info1 = renderInfoBox({
+    infoBox(
+      "Students total",
+      length(unique(quiz$STUDENT_KEY)),
+      icon = icon("list"),
+      color = "purple"
+    )
+  })
+  
+  output$inst.info2 = renderInfoBox({
+    infoBox(
+      "Attendance",
+      paste0(round(100 * mean(quiz$ATTENDED)), "%"),
+      icon = icon("list"),
+      color = "yellow"
+    )
+  })
+  
+  output$inst.plot1 = renderPlot({
+    hist(quiz$QUIZ_SCORE)
+  })
+  
+  output$inst.plot2 = renderPlot({
+    # I'm giving you three examples here
+    # only the last one will be displayed
+    # but you can try out each one.
+    # As you can see, using ggplot allows you to
+    # make much better-looking visualizations.
     
-#######################################
-####### BEGIN INPUT: Question 4 #######
-#######################################
+    # simple
+    hist(quiz$TOTAL_COMPLETED_CLICKER)
     
-    output$inst.info1 = renderInfoBox({
-        infoBox("Students total", 
-                length(unique(quiz$STUDENT_KEY)), 
-                icon = icon("list"), color = "purple")
-    })
+    # using ggplot
+    ggplot(quiz, aes(TOTAL_COMPLETED_CLICKER)) +
+      geom_histogram()
     
-    output$inst.info2 = renderInfoBox({
-        infoBox("Attendance",
-                paste0(round(100 * mean(quiz$ATTENDED)), "%"), 
-                icon = icon("list"), color = "yellow")
-    })
+    # using ggplot to make it clearer
+    ggplot(quiz, aes(x = TOTAL_COMPLETED_CLICKER)) +
+      geom_density(fill = "gray") + # makes the density line and gray fill
+      labs(x = "Completed Clicker Questions", y = "Density") + # change axis labels
+      theme_classic() # to use white background
     
-    output$inst.plot1 = renderPlot({
-        hist(quiz$QUIZ_SCORE)
-    })
-    
-    output$inst.plot2 = renderPlot({
-        # I'm giving you three examples here
-        # only the last one will be displayed
-        # but you can try out each one.
-        # As you can see, using ggplot allows you to 
-        # make much better-looking visualizations.
-      
-        # simple
-        hist(quiz$TOTAL_COMPLETED_CLICKER) 
-      
-        # using ggplot
-        ggplot(quiz, aes(TOTAL_COMPLETED_CLICKER)) + 
-          geom_histogram()
-        
-        # using ggplot to make it clearer
-        ggplot(quiz, aes(x = TOTAL_COMPLETED_CLICKER)) + 
-          geom_density(fill="gray") + # makes the density line and gray fill
-          labs(x = "Completed Clicker Questions", y = "Density") + # change axis labels
-          theme_classic() # to use white background 
-        
-    }) 
-    
-    output$inst.plot3 = renderPlot({
-        ggplot(session_summary, aes(x = Avg_Attendance, y = Avg_Quiz_Score)) +  
-        geom_line(group=1, colour="blue") +
-  geom_point(size=3, colour="red") +  
-  labs(title = "Avg_Quiz_Score vs. Avg_Attendance", x = "Avg_Attendance", y = "Avg_Quiz_Score") 
-    }) 
-    
-    output$inst.plot4 = renderPlot({
-        ggplot(session_summary, aes(x = YEAR, y = SESSION_NUMBER, fill=Avg_Temperature)) +  
-  geom_tile() +
-  scale_fill_gradient(low = "lightgreen", high = "darkgreen") +
-  labs(title = "Heatmap of Avg_Temperature", x = "Year", y = "Session Number") +
-  theme_minimal() + # Minimal theme 
-      scale_y_continuous(breaks = seq(from = min(session_summary$SESSION_NUMBER), 
-                                  to = max(session_summary$SESSION_NUMBER), by = 2))
-    }) 
-      
-    output$inst.plot5 = renderPlot({
-      ggplot(quiz, aes(x = factor(1), y = QUIZ_SCORE)) +
+  })
+  
+  output$inst.plot3 = renderPlot({
+    ggplot(session_summary, aes(x = Avg_Attendance, y = Avg_Quiz_Score)) +
+      geom_line(group = 1, colour = "blue") +
+      geom_point(size = 3, colour = "red") +
+      labs(title = "Avg_Quiz_Score vs. Avg_Attendance", x = "Avg_Attendance", y = "Avg_Quiz_Score")
+  })
+  
+  output$inst.plot4 = renderPlot({
+    ggplot(session_summary,
+           aes(x = YEAR, y = SESSION_NUMBER, fill = Avg_Temperature)) +
+      geom_tile() +
+      scale_fill_gradient(low = "lightgreen", high = "darkgreen") +
+      labs(title = "Heatmap of Avg_Temperature", x = "Year", y = "Session Number") +
+      theme_minimal() + # Minimal theme
+      scale_y_continuous(breaks = seq(
+        from = min(session_summary$SESSION_NUMBER),
+        to = max(session_summary$SESSION_NUMBER),
+        by = 2
+      ))
+  })
+  
+  output$inst.plot5 = renderPlot({
+    ggplot(quiz, aes(x = factor(1), y = QUIZ_SCORE)) +
       geom_boxplot() +
       labs(title = "Distribution of Quiz Scores", y = "Quiz Score") + theme_minimal() +
       coord_flip()
-    })
-    
-    output$inst.plot6 = renderPlot({ 
-      quiz_summary <- quiz %>%
+  })
+  
+  output$inst.plot6 = renderPlot({
+    quiz_summary <- quiz %>%
       group_by(ATTENDED) %>%
       summarise(Avg_Quiz_Score = mean(QUIZ_SCORE, na.rm = TRUE))
-      
-      ggplot(quiz_summary, aes(x = factor(ATTENDED), y = Avg_Quiz_Score, fill = factor(ATTENDED))) +
+    
+    ggplot(quiz_summary,
+           aes(
+             x = factor(ATTENDED),
+             y = Avg_Quiz_Score,
+             fill = factor(ATTENDED)
+           )) +
       geom_bar(stat = "identity") +
       labs(title = "Attendance vs. Average Quiz Score", x = "Attended", y = "Average Quiz Score") +
-      scale_fill_manual(values = c("blue", "red")) + 
+      scale_fill_manual(values = c("blue", "red")) +
       theme_minimal()
-    })
-#######################################
-#######################################
-    
+  })
+  #######################################
+  #######################################
+  
 }
 ```
 
@@ -373,20 +403,18 @@ You should be able to simply run the code below **as is** to see your dashboard.
 dhead = dashboardHeader(title = "Clicker Dashboard")
 
 # Here set up the sidebar which has links to two pages
-dside = dashboardSidebar(
-  sidebarMenu(
-    menuItem("Instructor View", tabName = "instructor", icon = icon("dashboard")),
-    menuItem("Student View", tabName = "student", icon = icon("th"))
-  )
-)
+dside = dashboardSidebar(sidebarMenu(
+  menuItem(
+    "Instructor View",
+    tabName = "instructor",
+    icon = icon("dashboard")
+  ),
+  menuItem("Student View", tabName = "student", icon = icon("th"))
+))
 
 # Here we set up the body of the dashboard
-dbody = dashboardBody(
-    tabItems(
-      student_dash,
-      instructor_dash
-    )
-)
+dbody = dashboardBody(tabItems(student_dash,
+                               instructor_dash))
 
 # Combining header, sidebar, and body
 ui = dashboardPage(dhead, dside, dbody)
