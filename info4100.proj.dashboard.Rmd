@@ -159,10 +159,10 @@ instructor_dash = tabItem(
   tabName = "instructor",
   h2("Instructor Dashboard"),
   
-  
   # Dynamic infoBoxes
   fluidRow(infoBoxOutput("inst.info1"),
-           infoBoxOutput("inst.info2")),
+           infoBoxOutput("inst.info2"),
+           infoBoxOutput("inst.info3")),
   # Any visualization
   fluidRow(
     box(title = "Performance Overview",
@@ -189,14 +189,14 @@ student_dash = tabItem(
            infoBoxOutput("inst.info2")),
   # Any visualization
   fluidRow(
-    box(title = "Plot1",
-        plotOutput("inst.plot1", height = 250)),
-    box(title = "2",
-        plotOutput("inst.plot2", height = 250)),
-    box(title = "3",
-        plotOutput("inst.plot3", height = 250)),
-    box(title = "4",
-        plotOutput("inst.plot4", height = 250))
+    box(title = "Quiz Score compare to Average Score",
+        plotOutput("inst.plot7", height = 250)),
+    box(title = "Engagement Rate compare to Overall Engagement",
+        plotOutput("inst.plot8", height = 250)),
+    box(title = "Clicker Line Correctness Plot",
+        plotOutput("inst.plot9", height = 250)),
+    box(title = "Radar Map of Skill Score",
+        plotOutput("inst.plot10", height = 250))
   )
 )
 
@@ -242,15 +242,16 @@ quiz_data_comapre = merge(session_2017, student_80, by = 'SESSION_NUMBER') %>%
 ## Use below for next grpah
 class_engagament = mean(session_2017$Avg_Participation_Rate)
 student_80_engagement = mean(student_80$TOTAL_COMPLETED_CLICKER / student_80$TOTAL_POSSIBLE_CLICKER)
+engagement_data = as.data.frame(list(name = c("Session", "Student"), 
+                                     rate = c(class_engagament, student_80_engagement)))
 
 #use the data below to create two heapmap for attendance check, one for class, one for student 80
-attendance_matrix_80 = student_80 %>%
-  select(SESSION_NUMBER, ATTENDED) %>%
-  spread(key = SESSION_NUMBER, value = ATTENDED)
-
-attendance_matrix = session_2017 %>%
-  select(SESSION_NUMBER, Avg_Attendance) %>%
-  spread(key = SESSION_NUMBER, value = Avg_Attendance)
+student_80$correct_quiz_clicker = student_80$CORRECT_Q_CLICKER / student_80$COMPLETED_Q_CLICKER
+student_80$correct_quiz_clicker[is.nan(student_80$correct_quiz_clicker)] = 0
+quiz_clicker_compare = merge(session_2017, student_80, by = 'SESSION_NUMBER') %>%
+  select(SESSION_NUMBER,
+         correct_quiz_clicker,
+         Avg_Correct_Quiz_Clicker)
 
 ## use the dataset below to create the radar chart to compare student 80's skill aginst others
 average_skills = experience %>%
@@ -277,6 +278,13 @@ student_skills_80 = experience %>%
     SKILL_SURVEY_SCORE
   )
 
+colnames(average_skills) = colnames(student_skills_80)
+max_scores = c(5, 5, 5, 5, 5, 5, 30)
+min_scores = c(0, 0, 0, 0, 0, 0, 0)
+
+skill_data = rbind(min_scores, max_scores, average_skills, student_skills_80)
+rownames(skill_data) <- c("min", "max", "Class Average", "Student 80")
+
 
 #######################################
 #######################################
@@ -293,7 +301,7 @@ server = function(input, output) {
   #######################################
   ####### BEGIN INPUT: Question 4 #######
   #######################################
-  
+  ## instructor plots
   output$inst.info1 = renderInfoBox({
     infoBox(
       "Students total",
@@ -309,6 +317,15 @@ server = function(input, output) {
       paste0(round(100 * mean(quiz$ATTENDED)), "%"),
       icon = icon("list"),
       color = "yellow"
+    )
+  })
+  
+  output$inst.info3 = renderInfoBox({
+    infoBox(
+      "Average Quiz Score",
+      round(mean(quiz$QUIZ_SCORE, na.rm = TRUE), 1),
+      icon = icon("graduation-cap"),
+      color = "green"
     )
   })
   
@@ -382,6 +399,72 @@ server = function(input, output) {
       scale_fill_manual(values = c("blue", "red")) +
       theme_minimal()
   })
+  
+  
+  ## student plots
+  # Line charts showing quiz scores over time compared to the class average.
+  output$inst.plot7 = renderPlot({
+    ggplot(quiz_data_comapre, aes(x = SESSION_NUMBER)) +
+      geom_line(aes(y = QUIZ_SCORE, group = 1, colour = "Quiz Score")) +
+      geom_line(aes(y = Avg_Quiz_Score, group = 1, colour = "Class Average")) +
+      labs(title = "Quiz Scores Over Time Compared to Class Average",
+           x = "Session Number",
+           y = "Score") +
+      scale_colour_manual("", 
+                          breaks = c("Quiz Score", "Class Average"),
+                          values = c("blue", "red")) +
+      theme_minimal()
+  })
+  
+  # bar graphs comparing the student engagement with the rest of the student
+  output$inst.plot8 = renderPlot({
+    ggplot(engagement_data, aes(x = name, y = rate, fill = name)) +
+      geom_bar(stat = "identity") +
+      labs(title = "Engagement Rate of Student 80 and Session", 
+           x = "", 
+           y = "Engagement Rate") +
+      scale_fill_manual(values = c("blue", "red")) +
+      theme(legend.position = "none") +
+      theme_minimal()
+  })
+  
+  # Heat maps or color-coded tables indicating attendance patterns
+  
+  output$inst.plot9 = renderPlot({
+    ggplot(quiz_clicker_compare, aes(x = SESSION_NUMBER)) +
+      geom_line(aes(y = correct_quiz_clicker, group = 1, colour = "Clicker")) +
+      geom_line(aes(y = Avg_Correct_Quiz_Clicker, group = 1, colour = "Class Average")) +
+      labs(title = "Clicker Over Time Compared to Class",
+           x = "Session Number",
+           y = "Clicker") +
+      scale_colour_manual("", 
+                          breaks = c("Clicker", "Class Average"),
+                          values = c("blue", "red")) +
+      theme_minimal()
+  })
+  
+  # Radar charts to compare the student's self-reported skills against averages
+  library(fmsb)
+  output$inst.plot10 = renderPlot({
+    # Plot the radar chart with corrected axis labels
+    radarchart(
+      skill_data,
+      axistype = 1,
+      pcol = c("blue", "red"),
+      plwd = 2,
+      plty = c(1, 4),
+      pfcol = c(rgb(0, 0, 1, 0.5), rgb(1, 0, 0, 0.5)),
+      cglcol = "gray",
+      cglty = 1,
+      cglwd = 0.8,
+      axislabcol = "black",
+      vlcex = 0.9,
+      caxislabels = seq(0, 5, 1),
+      # Redefine axis labels to match the 0-5 range
+      legend = rownames(skill_data)[3:4],
+      cex = 0.8,
+      title = "Average Skill Score compared to Student 80")
+  })
   #######################################
   #######################################
   
@@ -409,7 +492,9 @@ dside = dashboardSidebar(sidebarMenu(
     tabName = "instructor",
     icon = icon("dashboard")
   ),
-  menuItem("Student View", tabName = "student", icon = icon("th"))
+  menuItem("Student View",
+           tabName = "student",
+           icon = icon("th"))
 ))
 
 # Here we set up the body of the dashboard
