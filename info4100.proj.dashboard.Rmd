@@ -517,39 +517,43 @@ shinyApp(ui, server)
 *Reflection for the student dashboard*
 
 -   What do you like about it?
-    -   [add your answer here]
+    -   I like the part being a real grad student to think about what kind of question we are interested about.
 -   What would you change or add to it if you had more time?
-    -   [add your answer here]
+    -   if we have more time, we could be more foucesd on data processing and think about more deep questions.
 -   What was the biggest challenge you faced? How did you address it?
-    -   [add your answer here]
+    -   The  Biggest challenge was to create the radar chart, since we do not have prior knowledge of that.
 
 *Reflection for the teacher dashboard*
 
 -   What do you like about it?
-    -   [add your answer here]
+    -   I like the part of being able to think on the professor's side, to discuss what professors may want to know about a whole class.
 -   What would you change or add to it if you had more time?
-    -   [add your answer here]
+    -   If we have time, we would actually talk with a professor to get to know their actual thoughts.
 -   What was the biggest challenge you faced? How did you address it?
-    -   [add your answer here]
+    -   The biggest challenge was to create info box along with the chart. 
 
 # Self-reflection
 
 **Briefly summarize your experience on this homework. What was easy, what was hard, what did you learn?**
 
--   Insert your self-reflection here; it is used to improve the homework and course materials.
+-   I think this is fun group project, to get know learning in a more depth.
 
 # Estimate time spent
 
 **We want to give students an estimate of how much time this homework will take. Please indicate how many hours you spent to complete this homework here.**
 
--   I spent [insert your time] hours.
+-   I spent 4 hours.
 
 # Generative AI usage
 
 **As stated in the course syllabus, using generative AI is allowed to help you as you complete this homework. We are interested in how it is being used and whether it is helpful for you.**
 
--   How much did you use generative AI (e.g., not at all, some, most, or all the questions) and which one did you use?
--   If you used generative AI, how did you use it and was it helpful?
+-   I sometimes used to AI, mostly HiTA this time.
+-   Upon using HiTA, I found it was really helpful for dealing with
+    homework, because it can relate the contents for this week and
+    referance what we were writing and familiar with the data set we
+    were using. Unlike ChatGPT, it can be only used for general R
+    debugging.
 
 # Submit Homework
 
